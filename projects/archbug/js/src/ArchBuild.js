@@ -29,6 +29,7 @@ var TypeUtil =          bugpack.require('TypeUtil');
 var AwsConfig =         bugpack.require('aws.AwsConfig');
 var EC2Api =            bugpack.require('aws.EC2Api');
 var EC2SecurityGroup =  bugpack.require('aws.EC2SecurityGroup');
+var IAMApi =            bugpack.require('aws.IAMApi');
 var BugBoil =           bugpack.require('bugboil.BugBoil');
 var BugFlow =           bugpack.require('bugflow.BugFlow');
 
@@ -128,10 +129,12 @@ var ArchBuild = Class.extend(Obj, {
                 _this.buildSecurityGroups(function(error) {
                     flow.complete(error);
                 });
-            })/*,
+            }),
             $task(function(flow) {
-
-            })*/
+                _this.processUsers(function(error) {
+                    flow.complete(error);
+                });
+            })
         ]).execute(function(error) {
             callback(error);
         });
@@ -214,14 +217,11 @@ var ArchBuild = Class.extend(Obj, {
      * @param {function(Error)} callback
      */
     buildSecurityGroup: function(securityGroup, callback) {
-        var _this = this;
-        var groupName = this.archKey + "-" + securityGroup.groupName;
-        var description = securityGroup.description;
         var ec2SecurityGroup = null;
         var ec2Api = this.generateEC2Api(securityGroup.region);
         $series([
             $task(function(flow) {
-                ec2Api.getSecurityGroupByName(groupName, function(error, _ec2SecurityGroup) {
+                ec2Api.getSecurityGroupByName(securityGroup.groupName, function(error, _ec2SecurityGroup) {
                     if (!error) {
                         ec2SecurityGroup = _ec2SecurityGroup;
                         flow.complete();
@@ -232,15 +232,16 @@ var ArchBuild = Class.extend(Obj, {
             }),
             $task(function(flow) {
                 if (ec2SecurityGroup) {
-                    if (ec2SecurityGroup.getDescription() !== description) {
-                        console.log("Note that a security group description cannot be updated once it's been created");
-                    }
-                    flow.complete();
-                } else {
-                    ec2SecurityGroup = new EC2SecurityGroup({
-                        groupName: groupName,
-                        description: description
+                    ec2SecurityGroup.jsonUpdate(securityGroup);
+                    ec2Api.updateSecurityGroup(ec2SecurityGroup, function(error) {
+                        flow.complete(error);
                     });
+                } else {
+
+                    //TODO BRN: this should be improved by introducing a Marshaller class that can convert JSON to a specific class.
+
+                    ec2SecurityGroup = new EC2SecurityGroup();
+                    ec2SecurityGroup.jsonCreate(securityGroup);
                     ec2Api.createSecurityGroup(ec2SecurityGroup, function(error) {
                         flow.complete(error);
                     });
@@ -249,6 +250,16 @@ var ArchBuild = Class.extend(Obj, {
         ]).execute(function(error) {
             callback(error);
         });
+    },
+
+    /**
+     * @private
+     * @param {function(Error)} callback
+     */
+    processUsers: function(callback) {
+        //TEST
+        var iamApi = new IAMApi(this.awsConfig);
+        iamApi.listUsers({}, callback);
     }
 });
 

@@ -15,6 +15,7 @@
 //-------------------------------------------------------------------------------
 
 var bugpack = require('bugpack').context();
+var mustache = require('mustache');
 
 
 //-------------------------------------------------------------------------------
@@ -54,9 +55,14 @@ var ArchBug = {
         var archBuild = new ArchBuild();
         $series([
             $task(function(flow) {
-                blueprintPath.readFile(function(error, data) {
+                blueprintPath.readFile('utf8', function(error, data) {
+                    //TEST
+                    console.log(data);
+                    console.log(typeof data);
+
                     if (!error) {
-                        blueprint = JSON.parse(data);
+                        var temp = JSON.parse(data);
+                        blueprint = JSON.parse(mustache.render(data, temp));
                         flow.complete();
                     } else {
                         flow.error(error);
