@@ -98,18 +98,41 @@ var ArchBuild = Class.extend(Obj, {
     //-------------------------------------------------------------------------------
 
     /**
-     * @param blueprint
+     * @param config
      * @param {function(Error)} callback
      */
-    configure: function(blueprint, callback) {
-        this.configureBuild(blueprint);
+    configure: function(config, callback) {
+        this.configureBuild(config);
         callback();
     },
 
     /**
-     *
+     * @param blueprint
+     * @param {function(Error)} callback
      */
-    execute: function(callback) {
+    execute: function(blueprint, callback) {
+        if (blueprint.archKey) {
+            this.archKey = blueprint.archKey;
+        } else {
+            throw new Error("archKey is required in blueprint");
+        }
+        if (blueprint.securityGroups) {
+            if (TypeUtil.isArray(blueprint.securityGroups)) {
+                blueprint.securityGroups.forEach(function(securityGroup) {
+                    if (!securityGroup.groupName) {
+                        throw new Error("'name' is required in a security group entry");
+                    }
+                    if (!securityGroup.region) {
+                        throw new Error("'region' is required in a security group entry");
+                    }
+                });
+                this.securityGroups = blueprint.securityGroups;
+            } else {
+                throw new Error("securityGroups must be an array or empty in the blueprint");
+            }
+        } else {
+            this.securityGroups = [];
+        }
         this.buildFromBluePrint(callback);
     },
 
@@ -146,37 +169,13 @@ var ArchBuild = Class.extend(Obj, {
 
     /**
      * @private
-     * @param blueprint
+     * @param config
      */
-    configureBuild: function(blueprint) {
-        if (blueprint.archKey) {
-            this.archKey = blueprint.archKey;
+    configureBuild: function(config) {
+        if (config.awsConfig) {
+            this.awsConfig = new AwsConfig(config.awsConfig);
         } else {
-            throw new Error("archKey is required in blueprint");
-        }
-
-        if (blueprint.awsConfig) {
-            this.awsConfig = new AwsConfig(blueprint.awsConfig);
-        } else {
-            throw new Error("awsConfig is required in blueprint");
-        }
-
-        if (blueprint.securityGroups) {
-            if (TypeUtil.isArray(blueprint.securityGroups)) {
-                blueprint.securityGroups.forEach(function(securityGroup) {
-                    if (!securityGroup.groupName) {
-                        throw new Error("'name' is required in a security group entry");
-                    }
-                    if (!securityGroup.region) {
-                        throw new Error("'region' is required in a security group entry");
-                    }
-                });
-                this.securityGroups = blueprint.securityGroups;
-            } else {
-                throw new Error("securityGroups must be an array or empty in the blueprint");
-            }
-        } else {
-            this.securityGroups = [];
+            throw new Error("awsConfig is required in config");
         }
     },
 

@@ -47,19 +47,24 @@ var ArchBug = {
 
     /**
      * @param {string} blueprintLocation
+     * @param {string} configLocation
      * @param {function(Error)} callback
      */
-    build: function(blueprintLocation, callback) {
+    build: function(blueprintLocation, configLocation, callback) {
+
+        //TODO BRN: Add support for these being urls
+
         var blueprintPath = BugFs.path(blueprintLocation);
+        var configPath = null;
+        if (configLocation) {
+            configPath = BugFs.path(configLocation);
+        }
         var blueprint = null;
+        var config = null;
         var archBuild = new ArchBuild();
         $series([
             $task(function(flow) {
                 blueprintPath.readFile('utf8', function(error, data) {
-                    //TEST
-                    console.log(data);
-                    console.log(typeof data);
-
                     if (!error) {
                         var temp = JSON.parse(data);
                         blueprint = JSON.parse(mustache.render(data, temp));
@@ -70,15 +75,25 @@ var ArchBug = {
                 });
             }),
             $task(function(flow) {
+                configPath.readFile('utf8', function(error, data) {
+                    if (!error) {
+                        config = JSON.parse(data);
+                        flow.complete();
+                    } else {
+                        flow.error(error);
+                    }
+                });
+            }),
+            $task(function(flow) {
                 console.log("Configuring build");
-                //TEST
-                console.log(blueprint);
-                archBuild.configure(blueprint, function(error) {
+                archBuild.configure(config, function(error) {
                     flow.complete(error);
                 });
             }),
             $task(function(flow) {
-                archBuild.execute(function(error) {
+                console.log("Process blueprint for build");
+                console.log(blueprint);
+                archBuild.execute(blueprint, function(error) {
                     flow.complete(error);
                 });
             })

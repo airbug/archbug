@@ -72,7 +72,8 @@ var ArchBugCli = Class.extend(Obj, {
             'build': function(options, callback) {
                 console.log("Starting architecture build");
                 var blueprint = options.get("blueprint");
-                ArchBug.build(blueprint, callback);
+                var config = options.get("config");
+                ArchBug.build(blueprint, config, callback);
             }
         };
 
@@ -82,7 +83,9 @@ var ArchBugCli = Class.extend(Obj, {
          */
         this.optionFlags = {
             '-bp': 'blueprint',
-            '--blueprint': 'blueprint'
+            '--blueprint': 'blueprint',
+            '-c': 'config',
+            '--config': 'config'
         };
 
         /**
