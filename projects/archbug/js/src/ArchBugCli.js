@@ -6,9 +6,10 @@
 
 //@Export('ArchBugCli')
 
+//@Require('Class')
 //@Require('archbug.ArchBug')
+//@Require('bugcli.BugCli')
 //@Require('bugflow.BugFlow')
-//@Require('bugfs.BugFs')
 
 
 //-------------------------------------------------------------------------------
@@ -24,11 +25,9 @@ var path = require('path');
 //-------------------------------------------------------------------------------
 
 var Class =     bugpack.require('Class');
-var Map =       bugpack.require('Map');
-var Obj =       bugpack.require('Obj');
 var ArchBug =   bugpack.require('archbug.ArchBug');
+var BugCli =    bugpack.require('bugcli.BugCli');
 var BugFlow =   bugpack.require('bugflow.BugFlow');
-var BugFs =     bugpack.require('bugfs.BugFs');
 
 
 //-------------------------------------------------------------------------------
@@ -43,7 +42,7 @@ var $task =     BugFlow.$task;
 // Declare Class
 //-------------------------------------------------------------------------------
 
-var ArchBugCli = Class.extend(Obj, {
+var ArchBugCli = Class.extend(BugCli, {
 
     //-------------------------------------------------------------------------------
     // Constructor
@@ -52,47 +51,6 @@ var ArchBugCli = Class.extend(Obj, {
     _constructor: function() {
 
         this._super();
-
-
-        //-------------------------------------------------------------------------------
-        // Declare Variables
-        //-------------------------------------------------------------------------------
-
-        /**
-         * @private
-         * @type {Object}
-         */
-        this.action = null;
-
-        /**
-         * @private
-         * @type {Object}
-         */
-        this.actionFlags = {
-            'build': function(options, callback) {
-                console.log("Starting architecture build");
-                var blueprint = options.get("blueprint");
-                var config = options.get("config");
-                ArchBug.build(blueprint, config, callback);
-            }
-        };
-
-        /**
-         * @private
-         * @type {Object}
-         */
-        this.optionFlags = {
-            '-bp': 'blueprint',
-            '--blueprint': 'blueprint',
-            '-c': 'config',
-            '--config': 'config'
-        };
-
-        /**
-         * @private
-         * @type {Map.<string}
-         */
-        this.options = new Map();
     },
 
 
@@ -102,100 +60,103 @@ var ArchBugCli = Class.extend(Obj, {
 
 
     //-------------------------------------------------------------------------------
-    // Public Class Methods
+    // Bugcli Extended Class Methods
     //-------------------------------------------------------------------------------
 
     /**
      *
      */
-    execute: function(callback) {
-        var actionMethod = this.actionFlags[this.action];
-        actionMethod(this.options, callback);
-    },
+    configure: function(callback) {
+        var _this = this;
+        $series([
+            $task(function(flow) {
+                _this._super(function(error) {
+                    flow.complete(error);
+                });
+            }),
+            $task(function(flow) {
+                _this.registerCliAction({
+                    name: 'build',
+                    flags: [
+                        'build'
+                    ],
+                    parameters: [
+                        {
+                            name: "blueprintPath"
+                        }
+                    ],
+                    executeMethod: function(cliBuild, cliAction, callback) {
+                        console.log("Starting architecture build");
+                        /** @type {string} */
+                        var blueprintPath = cliAction.getParameter("blueprintPath");
+                        /** @type {CliOptionInstance} */
+                        var configOption = cliBuild.getOption("config");
+                        /** @type {string} */
+                        var configPath = "";
 
-    /**
-     *
-     */
-    initialize: function(argv, callback) {
-        var error = null;
-        for (var i = 2; i < argv.length; i++ ) {
-            var flag = argv[i];
-            if (this.actionFlags[flag]) {
-                if (!this.action) {
-                    this.action = flag;
-                } else {
-                    error = new Error("Only one action can be specified");
-                }
-            } else if (this.optionFlags[flag]) {
-                this.options.put(this.optionFlags[flag], argv[i + 1]);
-            }
-        }
-        callback(error);
-    },
-
-    /**
-     *
-     */
-    validate: function(callback) {
-        var error = null;
-        if (this.action) {
-            if (this.actionFlags[this.action]) {
-                if (this.action === "build") {
-                    if (this.options.containsKey("blueprint")) {
-                        //TODO BRN: Validate the blueprint is either a url or a file path
-                    } else {
-                        error = new Error("blue print option is required when executing the build action. " +
-                            "Use the --blueprint or -bp option to specify the blueprint path");
+                        if (configOption) {
+                            configPath = configOption.getParameter("configPath");
+                        }
+                        ArchBug.build(blueprintPath, configPath, callback);
+                    },
+                    validateMethod: function(cliBuild, cliAction, callback) {
+                        if (!cliAction.containsParameter('blueprintPath')) {
+                            callback(new Error("'build' action requires a file path parameter to the blueprint file."));
+                        }
+                        callback();
                     }
-                }
-            } else {
-                error = new Error("Unknown action '" + this.action + "'");
-            }
-        } else {
-            error = new Error("An action must be specified");
-        }
-        callback(error);
+                });
+
+                _this.registerCliAction({
+                    name: 'control',
+                    flags: [
+                        'control'
+                    ],
+                    parameters: [
+                        {
+                            name: "controlPath"
+                        }
+                    ],
+                    executeMethod: function(cliBuild, cliAction, callback) {
+                        console.log("Running server control");
+                        /** @type {string} */
+                        var controlPath = cliAction.getParameter("controlPath");
+                        /** @type {CliOptionInstance} */
+                        var configOption = cliBuild.getOption("config");
+                        /** @type {string} */
+                        var configPath = "";
+
+                        if (configOption) {
+                            configPath = configOption.getParameter("configPath");
+                        }
+                        ArchBug.control(controlPath, configPath, callback);
+                    },
+                    validateMethod: function(cliBuild, cliAction, callback) {
+                        if (!cliAction.containsParameter("controlPath")) {
+                            callback(new Error("'control' action requires a file path parameter to the control file"));
+                        }
+                        callback();
+                    }
+                });
+
+                _this.registerCliOption({
+                    name: 'config',
+                    flags: [
+                        '-c',
+                        '--config'
+                    ],
+                    parameters: [
+                        {
+                            name: "configPath"
+                        }
+                    ]
+                });
+
+                flow.complete();
+            })
+        ]).execute(callback);
     }
 });
-
-
-//-------------------------------------------------------------------------------
-// Static Methods
-//-------------------------------------------------------------------------------
-
-/**
- * @param {Array.<string>} argv
- */
-ArchBugCli.execute = function(argv) {
-    var archBugCli = new ArchBugCli();
-
-    $series([
-        $task(function(flow) {
-            archBugCli.initialize(argv, function(error) {
-                flow.complete(error);
-            });
-        }),
-        $task(function(flow) {
-            archBugCli.validate(function(error) {
-                flow.complete(error);
-            });
-        }),
-        $task(function(flow) {
-            archBugCli.execute(function(error) {
-                flow.complete(error);
-            });
-        })
-    ]).execute(function(error) {
-        if (!error) {
-            console.log("archbug ran successfully");
-        } else {
-            console.log(error);
-            console.log(error.stack);
-            console.log("archbug encountered an error");
-            process.exit(1);
-        }
-    });
-};
 
 
 //-------------------------------------------------------------------------------
