@@ -37,7 +37,7 @@ var nodejs      = enableModule('nodejs');
 buildProperties({
     packageJson: {
         name: "archbug",
-        version: "0.0.1",
+        version: "0.0.2",
         main: "./lib/archbug-module.js",
         bin: "bin/archbug",
         dependencies: {
@@ -46,11 +46,16 @@ buildProperties({
             mustache: "0.7.x"
         }
     },
+    resourcePaths: [
+        "./projects/archbug/js/resources"
+    ],
     sourcePaths: [
         '../bugjs/projects/annotate/js/src',
         '../bugjs/projects/aws/js/src',
         '../bugjs/projects/bugjs/js/src',
         '../bugjs/projects/bugboil/js/src',
+        '../bugjs/projects/bugcli/js/src',
+        '../bugjs/projects/bugcontrol/js/src',
         '../bugjs/projects/bugflow/js/src',
         '../bugjs/projects/bugfs/js/src',
         '../bugjs/projects/bugtrace/js/src',
@@ -62,6 +67,7 @@ buildProperties({
         "../bugunit/projects/bugunit/js/scripts"
     ],
     testPaths: [
+        "../bugjs/projects/bugcli/js/test",
         "../bugjs/projects/bugjs/js/test"
     ],
     binPaths: [
