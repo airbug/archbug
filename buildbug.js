@@ -53,7 +53,6 @@ buildProperties({
         '../bugjs/projects/annotate/js/src',
         '../bugjs/projects/aws/js/src',
         '../bugjs/projects/bugjs/js/src',
-        '../bugjs/projects/bugboil/js/src',
         '../bugjs/projects/bugcli/js/src',
         '../bugjs/projects/bugcontrol/js/src',
         '../bugjs/projects/bugflow/js/src',
