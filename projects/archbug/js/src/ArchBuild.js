@@ -30,7 +30,6 @@ var AwsConfig =         bugpack.require('aws.AwsConfig');
 var EC2Api =            bugpack.require('aws.EC2Api');
 var EC2SecurityGroup =  bugpack.require('aws.EC2SecurityGroup');
 var IAMApi =            bugpack.require('aws.IAMApi');
-var BugBoil =           bugpack.require('bugboil.BugBoil');
 var BugFlow =           bugpack.require('bugflow.BugFlow');
 
 
@@ -38,7 +37,7 @@ var BugFlow =           bugpack.require('bugflow.BugFlow');
 // Simplify References
 //-------------------------------------------------------------------------------
 
-var $foreachParallel =  BugBoil.$foreachParallel;
+var $foreachParallel =  BugFlow.$foreachParallel;
 var $series =           BugFlow.$series;
 var $task =             BugFlow.$task;
 
@@ -203,9 +202,9 @@ var ArchBuild = Class.extend(Obj, {
      */
     buildSecurityGroups: function(callback) {
         var _this = this;
-        $foreachParallel(this.securityGroups, function(boil, securityGroup) {
+        $foreachParallel(this.securityGroups, function(flow, securityGroup) {
             _this.buildSecurityGroup(securityGroup, function(error) {
-                boil.bubble(error);
+                flow.complete(error);
             });
         }).execute(callback);
     },
