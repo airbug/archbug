@@ -58,6 +58,7 @@ buildProperties({
         '../bugjs/projects/bugflow/js/src',
         '../bugjs/projects/bugfs/js/src',
         '../bugjs/projects/bugtrace/js/src',
+        "../bugunit/projects/bugdouble/js/src",
         "../bugunit/projects/bugunit/js/src",
         './projects/archbug/js/src'
     ],
