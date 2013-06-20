@@ -37,7 +37,7 @@ var BugFlow =           bugpack.require('bugflow.BugFlow');
 // Simplify References
 //-------------------------------------------------------------------------------
 
-var $foreachParallel =  BugFlow.$foreachParallel;
+var $forEachParallel =  BugFlow.$forEachParallel;
 var $series =           BugFlow.$series;
 var $task =             BugFlow.$task;
 
@@ -202,7 +202,7 @@ var ArchBuild = Class.extend(Obj, {
      */
     buildSecurityGroups: function(callback) {
         var _this = this;
-        $foreachParallel(this.securityGroups, function(flow, securityGroup) {
+        $forEachParallel(this.securityGroups, function(flow, securityGroup) {
             _this.buildSecurityGroup(securityGroup, function(error) {
                 flow.complete(error);
             });
