@@ -50,7 +50,7 @@ buildProperties({
         "./projects/archbug/js/resources"
     ],
     sourcePaths: [
-        '../bugjs/projects/annotate/js/src',
+        '../bugjs/projects/bugmeta/js/src',
         '../bugjs/projects/aws/js/src',
         '../bugjs/projects/bugjs/js/src',
         '../bugjs/projects/bugcli/js/src',
