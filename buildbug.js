@@ -143,11 +143,6 @@ buildTarget('local').buildFlow(
                 });
             }
         }),
-        targetTask("s3EnsureBucket", {
-            properties: {
-                bucket: buildProject.getProperty("local-bucket")
-            }
-        }),
         targetTask("s3PutFile", {
             init: function(task, buildProject, properties) {
                 var packedNodePackage = nodejs.findPackedNodePackage(buildProject.getProperty("packageJson.name"),
@@ -211,11 +206,6 @@ buildTarget('prod').buildFlow(
                 task.updateProperties({
                     modulePath: packedNodePackage.getFilePath()
                 });
-            }
-        }),
-        targetTask("s3EnsureBucket", {
-            properties: {
-                bucket: "airbug"
             }
         }),
         targetTask("s3PutFile", {
