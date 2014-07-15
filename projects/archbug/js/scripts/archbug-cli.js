@@ -3,55 +3,55 @@
 //-------------------------------------------------------------------------------
 
 //@Require('archbug.ArchBugCli')
-//@Require('bugflow.BugFlow')
+//@Require('Flows')
 
 
 //-------------------------------------------------------------------------------
-// Common Modules
+// Context
 //-------------------------------------------------------------------------------
 
-var bugpack = require('bugpack').context(module);
+require('bugpack').context(module, function(bugpack) {
+
+    //-------------------------------------------------------------------------------
+    // BugPack
+    //-------------------------------------------------------------------------------
+
+    var ArchBugCli =    bugpack.require('archbug.ArchBugCli');
+    var Flows =       bugpack.require('Flows');
 
 
-//-------------------------------------------------------------------------------
-// BugPack
-//-------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------
+    // Simplify References
+    //-------------------------------------------------------------------------------
 
-var ArchBugCli =    bugpack.require('archbug.ArchBugCli');
-var BugFlow =       bugpack.require('bugflow.BugFlow');
-
-
-//-------------------------------------------------------------------------------
-// Simplify References
-//-------------------------------------------------------------------------------
-
-var $series =   BugFlow.$series;
-var $task =     BugFlow.$task;
+    var $series =   Flows.$series;
+    var $task =     Flows.$task;
 
 
-//-------------------------------------------------------------------------------
-// Bootstrap
-//-------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------
+    // Bootstrap
+    //-------------------------------------------------------------------------------
 
-var archBugCli = new ArchBugCli();
-$series([
-    $task(function(flow) {
-        archBugCli.configure(function(error) {
-            flow.complete(error);
-        });
-    }),
-    $task(function(flow) {
-        archBugCli.run(process.argv, function(error) {
-            flow.complete(error);
-        });
-    })
-]).execute(function(error) {
-    if (!error) {
-        console.log("archbug ran successfully");
-    } else {
-        console.log(error);
-        console.log(error.stack);
-        console.log("archbug encountered an error");
-        process.exit(1);
-    }
+    var archBugCli = new ArchBugCli();
+    $series([
+        $task(function(flow) {
+            archBugCli.configure(function(error) {
+                flow.complete(error);
+            });
+        }),
+        $task(function(flow) {
+            archBugCli.run(process.argv, function(error) {
+                flow.complete(error);
+            });
+        })
+    ]).execute(function(error) {
+        if (!error) {
+            console.log("archbug ran successfully");
+        } else {
+            console.log(error);
+            console.log(error.stack);
+            console.log("archbug encountered an error");
+            process.exit(1);
+        }
+    });
 });
