@@ -42,7 +42,7 @@ buildProperties({
         bin: "bin/archbug",
         dependencies: {
             "aws-sdk": "0.9.x",
-            bugpack: 'https://s3.amazonaws.com/deploy-airbug/bugpack-0.0.5.tgz',
+            bugpack: "0.1.14",
             mustache: "0.7.x"
         }
     },
