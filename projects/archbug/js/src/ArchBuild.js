@@ -25,10 +25,10 @@ require('bugpack').context("*", function(bugpack) {
     var Map =               bugpack.require('Map');
     var Obj =               bugpack.require('Obj');
     var TypeUtil =          bugpack.require('TypeUtil');
-    var AwsConfig =         bugpack.require('aws.AwsConfig');
-    var EC2Api =            bugpack.require('aws.EC2Api');
-    var EC2SecurityGroup =  bugpack.require('aws.EC2SecurityGroup');
-    var IAMApi =            bugpack.require('aws.IAMApi');
+    var AwsConfig =         bugpack.require('bugaws.AwsConfig');
+    var EC2Api =            bugpack.require('bugaws.EC2Api');
+    var EC2SecurityGroup =  bugpack.require('bugaws.EC2SecurityGroup');
+    var IAMApi =            bugpack.require('bugaws.IAMApi');
     var Flows =           bugpack.require('Flows');
 
 

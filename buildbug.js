@@ -50,25 +50,22 @@ buildProperties({
         "./projects/archbug/js/resources"
     ],
     sourcePaths: [
-        '../bugjs/projects/bugmeta/js/src',
-        '../bugjs/projects/aws/js/src',
-        '../bugjs/projects/bugjs/js/src',
-        '../bugjs/projects/bugcli/js/src',
-        '../bugjs/projects/bugcontrol/js/src',
-        '../bugjs/projects/bugflow/js/src',
-        '../bugjs/projects/bugfs/js/src',
-        '../bugjs/projects/bugtrace/js/src',
-        "../bugunit/projects/bugdouble/js/src",
-        "../bugunit/projects/bugunit/js/src",
-        './projects/archbug/js/src'
+        "../bugaws/libraries/bugaws/js/src",
+        "../bugcli/libraries/bugcli/js/src",
+        "../bugcore/libraries/bugcore/js/src",
+        "../bugdouble/libraries/bugdouble/js/src",
+        "../bugfs/libraries/bugfs/js/src",
+        "../bugmeta/libraries/bugmeta/js/src",
+        "../bugunit/libraries/bugunit/js/src",
+        "./projects/archbug/js/src"
     ],
     scriptPaths: [
         "./projects/archbug/js/scripts",
-        "../bugunit/projects/bugunit/js/scripts"
+        "../bugunit/libraries/bugunit/js/scripts"
     ],
     testPaths: [
-        "../bugjs/projects/bugcli/js/test",
-        "../bugjs/projects/bugjs/js/test"
+        "../bugcli/libraries/bugcli/js/test",
+        "../bugcore/libraries/bugcore/js/test"
     ],
     binPaths: [
         "./projects/archbug/bin"
