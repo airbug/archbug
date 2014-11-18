@@ -42,7 +42,7 @@ buildProperties({
         bin: "bin/archbug",
         dependencies: {
             "aws-sdk": "0.9.x",
-            bugpack: "0.1.14",
+            bugpack: "0.2.0",
             mustache: "0.7.x"
         }
     },
